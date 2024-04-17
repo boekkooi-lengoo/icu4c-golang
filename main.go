@@ -7,6 +7,8 @@ import (
 
 // https://github.com/unicode-org/icu/blob/617b094df3eb853a35f1227472178836ce625cff/docs/userguide/strings/utext.md?plain=1#L94
 func main() {
+	defer icu.Cleanup()
+
 	bi, err := icu.NewBreakIterator(icu.BreakSentence, "de@ss=standard", "Well this is an n. Chr. hello world. This is a sentence.")
 	if err != nil {
 		log.Fatalln(err)

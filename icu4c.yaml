@@ -3,24 +3,24 @@ GENERATOR:
   PackageDescription: "Package vorbis provides Go bindings for ICU4C."
   PackageLicense: ""
   PkgConfigOpts: [icu-i18n, icu-io, icu-uc]
-  SysIncludes: [
-    "unicode/utypes.h",
-    "unicode/utext.h",
-    "unicode/ubrk.h",
-  ]
+  SysIncludes:
+    - "unicode/utypes.h"
+    - "unicode/utext.h"
+    - "unicode/ubrk.h"
+    - "unicode/uclean.h"
   Options:
     SafeStrings: true
   FlagGroups:
     - { name: LDFLAGS, flags: [ -licuuc -licudata ] }
 PARSER:
   IncludePaths: ["/usr/include/"]
-  SourcesPaths: [
-    "unicode/utypes.h",
+  SourcesPaths:
+    - "unicode/utypes.h"
     # https://github.com/unicode-org/icu/blob/main/icu4c/source/common/unicode/utext.h
-    "unicode/utext.h",
+    - "unicode/utext.h"
     # https://github.com/unicode-org/icu/blob/main/icu4c/source/common/unicode/ubrk.h
-    "unicode/ubrk.h",
-  ]
+    - "unicode/ubrk.h"
+    - "unicode/uclean.h"
 TRANSLATOR:
   PtrTips:
     function:
@@ -50,6 +50,7 @@ TRANSLATOR:
       - {action: replace, from: "^U", to: ""}
       - {transform: unexport}
     function:
+      - {action: accept, from: "^u_cleanup"}
       - {action: accept, from: "^u_errorName_"}
       - {action: accept, from: "^utext_(openUTF8|close)"}
       - {action: accept, from: "^ubrk_(open|close|next|getRuleStatus|setUText)_"}
@@ -63,10 +64,7 @@ TRANSLATOR:
       - {action: replace, from: "(?i)^utext_", to: "Text_"}
       - {action: replace, from: "^u_", to: ""}
       - {transform: unexport}
+      - {action: replace, from: "^cleanup", to: "Cleanup"}
     post-global:
       - {action: replace, from: "_$"}
       - {load: snakecase}
-# https://github.com/unicode-org/icu/tree/main/icu4c
-# wget https://github.com/unicode-org/icu/releases/download/release-74-2/icu4c-74_2-src.tgz
-#cgo CFLAGS: -I/opt/homebrew/opt/icu4c/include
-#cgo LDFLAGS: -L/opt/homebrew/opt/icu4c/lib -licuuc -licudata

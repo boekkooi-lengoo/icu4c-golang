@@ -49,14 +49,20 @@ func (bi *BreakIterator) Close() {
 }
 
 func (bi *BreakIterator) closeTextUnit() {
-	textClose(bi.textUnit).Free()
-	bi.textUnit.Free()
+	if bi.textUnit != nil {
+		textClose(bi.textUnit).Free()
+		bi.textUnit.Free()
+	}
+	bi.textUnit = nil
 }
 
 func (bi *BreakIterator) closeBreakIterator() {
-	breakClose(bi.iterator)
-	// Calling free causes `free(): double free detected in tcache 2`
-	//bi.iterator.Free()
+	if bi.iterator != nil {
+		breakClose(bi.iterator)
+		// Calling free causes `free(): double free detected in tcache 2`
+		//bi.iterator.Free()
+	}
+	bi.iterator = nil
 }
 
 // IsSuccess returns true if the error code indicate success (mimics U_SUCCESS)

@@ -10,6 +10,7 @@ import (
 )
 
 func TestNewBreakIterator(t *testing.T) {
+	t.Cleanup(Cleanup)
 	t.Run("Invalid Break Type", func(t *testing.T) {
 		bi, err := NewBreakIterator(-1, "en-us", "Unknown Locale provided")
 		assert.Error(t, err)
@@ -72,6 +73,8 @@ func TestNewBreakIterator(t *testing.T) {
 }
 
 func FuzzNewBreakIterator(f *testing.F) {
+	f.Cleanup(Cleanup)
+
 	testcases := []string{"Hello, world", " ", "a\xc5z", "!12345"}
 	for _, tc := range testcases {
 		f.Add(tc)
