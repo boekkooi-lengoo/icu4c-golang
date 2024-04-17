@@ -4,10 +4,10 @@ tools_vendor=$(tools_path)/vendor
 
 c-for-go=$(tools_path)/bin/c-for-go
 
-run: $(build-icu4c)
+run: build-icu4c
 	go run main.go
 
-build: $(build-icu4c)
+build: build-icu4c
 	go build main.go
 
 build-icu4c: $(c-for-go)
