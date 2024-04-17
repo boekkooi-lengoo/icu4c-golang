@@ -6,6 +6,17 @@ import (
 	"unicode/utf8"
 )
 
+// Initialize will attempt to load some part of ICU's data, and is useful as a test for configuration or installation problems that leave the ICU data inaccessible.
+// Use of this function is optional.
+func Initialize() error {
+	var errCode errorCode
+	icuInit(&errCode)
+	if errCode.IsFailure() {
+		return errCode
+	}
+	return nil
+}
+
 type BreakIterator struct {
 	textUnit *text
 	iterator *breakIterator

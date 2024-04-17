@@ -29,6 +29,7 @@ TRANSLATOR:
       - {target: ^ubrk_setUText_, tips: [ref, ref, ref]}
       - {target: ^utext_openUTF8_, tips: [ref,size,size,ref]}
       - {target: ^utext_close_, tips: [ref]}
+      - {target: ^u_init, tips: [ref]}
   Rules:
     const:
       - {action: accept, from: "^U_ZERO_ERROR$"}
@@ -51,6 +52,7 @@ TRANSLATOR:
       - {transform: unexport}
     function:
       - {action: accept, from: "^u_cleanup"}
+      - {action: accept, from: "^u_init"}
       - {action: accept, from: "^u_errorName_"}
       - {action: accept, from: "^utext_(openUTF8|close)"}
       - {action: accept, from: "^ubrk_(open|close|next|getRuleStatus|setUText)_"}
@@ -62,6 +64,7 @@ TRANSLATOR:
       - {action: replace, from: "(?i)^ubrk_", to: "Break_"}
       - {action: replace, from: "(?i)^utext_openUTF8", to: "Text_Open_UTF8"}
       - {action: replace, from: "(?i)^utext_", to: "Text_"}
+      - {action: replace, from: "(?i)^u_init", to: "icuInit"}
       - {action: replace, from: "^u_", to: ""}
       - {transform: unexport}
       - {action: replace, from: "^cleanup", to: "Cleanup"}
