@@ -1,0 +1,72 @@
+GENERATOR:
+  PackageName: icu
+  PackageDescription: "Package vorbis provides Go bindings for ICU4C."
+  PackageLicense: ""
+  PkgConfigOpts: [icu-i18n, icu-io, icu-uc]
+  SysIncludes: [
+    "unicode/utypes.h",
+    "unicode/utext.h",
+    "unicode/ubrk.h",
+  ]
+  Options:
+    SafeStrings: true
+  FlagGroups:
+    - { name: LDFLAGS, flags: [ -licuuc -licudata ] }
+PARSER:
+  IncludePaths: ["/usr/include/"]
+  SourcesPaths: [
+    "unicode/utypes.h",
+    # https://github.com/unicode-org/icu/blob/main/icu4c/source/common/unicode/utext.h
+    "unicode/utext.h",
+    # https://github.com/unicode-org/icu/blob/main/icu4c/source/common/unicode/ubrk.h
+    "unicode/ubrk.h",
+  ]
+TRANSLATOR:
+  PtrTips:
+    function:
+      - {target: ^ubrk_(close|next|getRuleStatus)_, tips: [ref]}
+      - {target: ^ubrk_open_, tips: [ref, size, size, size, ref]}
+      - {target: ^ubrk_setUText_, tips: [ref, ref, ref]}
+      - {target: ^utext_openUTF8_, tips: [ref,size,size,ref]}
+      - {target: ^utext_close_, tips: [ref]}
+  Rules:
+    const:
+      - {action: accept, from: "^U_ZERO_ERROR$"}
+      - {action: accept, from: "^UBRK_"}
+      - {action: accept, from: "^U_(BRK|WB|SB|LB)_"}
+      - {transform: lower}
+      - {action: replace, from: "(?i)^U_ZERO_ERROR$", to: "Zero_Error"}
+      - {action: replace, from: "(?i)^UBRK_", to: "Break_"}
+      - {action: replace, from: "(?i)^U_BRK_", to: "Break_"}
+      - {action: replace, from: "(?i)^U_WB_", to: "WordBreak_"}
+      - {action: replace, from: "(?i)^U_LB_", to: "LineBreak_"}
+      - {action: replace, from: "(?i)^U_SB_", to: "SentenceBreak_"}
+    type:
+      - {action: accept, from: "^UBreakIterator"}
+      - {action: accept, from: "^U(WordBreak|LineBreakTag|SentenceBreakTag)"}
+      - {action: accept, from: "^UText$"}
+      - {action: accept, from: "^UErrorCode"}
+      - {action: replace, from: "_t$", to: ""}
+      - {action: replace, from: "^U", to: ""}
+      - {transform: unexport}
+    function:
+      - {action: accept, from: "^u_errorName_"}
+      - {action: accept, from: "^utext_(openUTF8|close)"}
+      - {action: accept, from: "^ubrk_(open|close|next|getRuleStatus|setUText)_"}
+      - {transform: lower}
+      - {action: replace, from: "_74$", to: ""}
+      - {action: replace, from: "(?i)^u_errorName", to: "Error_Name"}
+      - {action: replace, from: "(?i)^ubrk_getRuleStatus", to: "Break_Get_Rule_Status"}
+      - {action: replace, from: "(?i)^ubrk_setUText", to: "Break_Set_Text"}
+      - {action: replace, from: "(?i)^ubrk_", to: "Break_"}
+      - {action: replace, from: "(?i)^utext_openUTF8", to: "Text_Open_UTF8"}
+      - {action: replace, from: "(?i)^utext_", to: "Text_"}
+      - {action: replace, from: "^u_", to: ""}
+      - {transform: unexport}
+    post-global:
+      - {action: replace, from: "_$"}
+      - {load: snakecase}
+# https://github.com/unicode-org/icu/tree/main/icu4c
+# wget https://github.com/unicode-org/icu/releases/download/release-74-2/icu4c-74_2-src.tgz
+#cgo CFLAGS: -I/opt/homebrew/opt/icu4c/include
+#cgo LDFLAGS: -L/opt/homebrew/opt/icu4c/lib -licuuc -licudata
