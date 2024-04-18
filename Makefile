@@ -8,6 +8,15 @@ icu4c_path="$(CURDIR)/icu"
 run: build-icu4c
 	go run main.go
 
+test:
+	go test "$(CURDIR)/..."
+
+test-fuzz:
+	go test -fuzz=. "$(CURDIR)/icu" -fuzztime 60s
+
+benchmark:
+	go test -bench=. "$(CURDIR)/..."
+
 build: build-icu4c
 	go build main.go
 
