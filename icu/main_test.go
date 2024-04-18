@@ -260,12 +260,19 @@ func BenchmarkBreakIterator_Clone(b *testing.B) {
 	bi, err := NewBreakIterator(BreakCharacter, "en-us")
 	require.NoError(b, err)
 
+	var clone *BreakIterator
 	for i := 0; i < b.N; i++ {
+		clone, err = bi.Clone()
+		if err != nil {
+			b.Error(err)
+			continue
+		}
+
 		txt := "Hello World" + strconv.Itoa(i)
-		err = bi.SetText(txt)
+		err = clone.SetText(txt)
 		if err != nil {
 			b.Error(txt, err)
-		} else if len(getBreaks(bi)) != utf8.RuneCountInString(txt) {
+		} else if len(getBreaks(clone)) != utf8.RuneCountInString(txt) {
 			b.Error("invalid character count")
 		}
 	}
