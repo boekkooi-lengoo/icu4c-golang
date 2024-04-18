@@ -62,24 +62,20 @@ func (bi *BreakIterator) SetText(txt string) error {
 	if bi.IsClosed() {
 		return ErrBreakIteratorIsClosed
 	}
-
 	if !utf8.ValidString(txt) {
 		return ErrTextIsNotUTF8
 	}
 
-	var textUnit *text
 	var errCode errorCode
-	textUnit = textOpenUTF8(textUnit, txt, int64(len(txt)), &errCode)
+	textUnit := textOpenUTF8(nil, txt, int64(len(txt)), &errCode)
 	if errCode.IsFailure() {
-		textClose(textUnit)
-		textUnit.Free()
+		freeText(textUnit)
 		return errCode
 	}
 
 	breakSetText(bi.iterator, textUnit, &errCode)
 	if errCode.IsFailure() {
-		textClose(textUnit)
-		textUnit.Free()
+		freeText(textUnit)
 		return errCode
 	}
 
@@ -104,10 +100,7 @@ func (bi *BreakIterator) IsClosed() bool {
 }
 
 func (bi *BreakIterator) closeTextUnit() {
-	if bi.textUnit != nil {
-		textClose(bi.textUnit).Free()
-		bi.textUnit.Free()
-	}
+	freeText(bi.textUnit)
 	bi.textUnit = nil
 }
 
@@ -134,4 +127,11 @@ func (c errorCode) IsFailure() bool {
 
 func (c errorCode) Error() string {
 	return fmt.Sprintf("ICU error (%d) %s", c, errorName(c))
+}
+
+func freeText(textUnit *text) {
+	if textUnit != nil {
+		textClose(textUnit).Free()
+		textUnit.Free()
+	}
 }
