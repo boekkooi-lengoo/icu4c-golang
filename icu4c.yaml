@@ -72,3 +72,4 @@ TRANSLATOR:
     post-global:
       - {action: replace, from: "_$"}
       - {load: snakecase}
+      - {action: doc, from: "(?i)^u", to: "https://github.com/unicode-org/icu/blob/release-74-2/icu4c/source/common/$path#L$line"}
