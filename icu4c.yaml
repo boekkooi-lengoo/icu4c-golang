@@ -25,6 +25,7 @@ TRANSLATOR:
   PtrTips:
     function:
       - {target: ^ubrk_(close|next|getRuleStatus)_, tips: [ref]}
+      - {target: ^ubrk_clone, tips: [ref, ref]}
       - {target: ^ubrk_open_, tips: [ref, size, size, size, ref]}
       - {target: ^ubrk_setUText_, tips: [ref, ref, ref]}
       - {target: ^utext_openUTF8_, tips: [ref,size,size,ref]}
@@ -55,7 +56,7 @@ TRANSLATOR:
       - {action: accept, from: "^u_init"}
       - {action: accept, from: "^u_errorName_"}
       - {action: accept, from: "^utext_(openUTF8|close)"}
-      - {action: accept, from: "^ubrk_(open|close|next|getRuleStatus|setUText)_"}
+      - {action: accept, from: "^ubrk_(open|close|next|getRuleStatus|setUText|clone)_"}
       - {transform: lower}
       - {action: replace, from: "_74$", to: ""}
       - {action: replace, from: "(?i)^u_errorName", to: "Error_Name"}

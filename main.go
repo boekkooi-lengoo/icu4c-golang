@@ -14,11 +14,16 @@ func main() {
 
 	defer icu.Cleanup()
 
-	bi, err := icu.NewBreakIterator(icu.BreakSentence, "de@ss=standard", "Well this is an n. Chr. hello world. This is a sentence.")
+	bi, err := icu.NewBreakIterator(icu.BreakSentence, "de@ss=standard")
 	if err != nil {
 		log.Fatalln(err)
 	}
 	defer bi.Close()
+
+	err = bi.SetText("Well this is an n. Chr. hello world. This is a sentence.")
+	if err != nil {
+		log.Fatalln(err)
+	}
 
 	for {
 		pos := bi.Next()

@@ -6,6 +6,12 @@ import (
 	"unicode/utf8"
 )
 
+var (
+	ErrTextIsNotUTF8             = errors.New("text is not valid UTF-8")
+	ErrBreakIteratorIsClosed     = errors.New("the BreakIterator is closed")
+	ErrBreakIteratorContainsText = errors.New("operation not permitted because the BreakIterator contains text")
+)
+
 // Initialize will attempt to load some part of ICU's data, and is useful as a test for configuration or installation problems that leave the ICU data inaccessible.
 // Use of this function is optional.
 func Initialize() error {
@@ -22,32 +28,66 @@ type BreakIterator struct {
 	iterator *breakIterator
 }
 
-func NewBreakIterator(breakType breakIteratorType, locale, text string) (*BreakIterator, error) {
-	if !utf8.ValidString(text) {
-		return nil, errors.New("text is not valid UTF-8")
-	}
-
+func NewBreakIterator(breakType breakIteratorType, locale string) (*BreakIterator, error) {
 	var errCode errorCode
 	bi := &BreakIterator{}
-	bi.textUnit = textOpenUTF8(bi.textUnit, text, int64(len(text)), &errCode)
-	if errCode.IsFailure() {
-		bi.closeTextUnit()
-		return nil, errCode
-	}
-
 	bi.iterator = breakOpen(breakType, locale, nil, 0, &errCode)
 	if errCode.IsFailure() {
 		bi.Close()
 		return nil, errCode
 	}
+	return bi, nil
+}
 
-	breakSetText(bi.iterator, bi.textUnit, &errCode)
+func (bi *BreakIterator) Clone() (*BreakIterator, error) {
+	if bi.IsClosed() {
+		return nil, ErrBreakIteratorIsClosed
+	}
+	if bi.textUnit != nil {
+		return nil, ErrBreakIteratorContainsText
+	}
+
+	var errCode errorCode
+	clone := &BreakIterator{}
+	clone.iterator = breakClone(bi.iterator, &errCode)
 	if errCode.IsFailure() {
-		bi.Close()
+		clone.Close()
 		return nil, errCode
 	}
 
-	return bi, nil
+	return clone, nil
+}
+
+func (bi *BreakIterator) SetText(txt string) error {
+	if bi.IsClosed() {
+		return ErrBreakIteratorIsClosed
+	}
+
+	if !utf8.ValidString(txt) {
+		return ErrTextIsNotUTF8
+	}
+
+	var textUnit *text
+	var errCode errorCode
+	textUnit = textOpenUTF8(textUnit, txt, int64(len(txt)), &errCode)
+	if errCode.IsFailure() {
+		textClose(textUnit)
+		textUnit.Free()
+		return errCode
+	}
+
+	breakSetText(bi.iterator, textUnit, &errCode)
+	if errCode.IsFailure() {
+		textClose(textUnit)
+		textUnit.Free()
+		return errCode
+	}
+
+	if bi.textUnit != nil {
+		bi.closeTextUnit()
+	}
+	bi.textUnit = textUnit
+	return nil
 }
 
 func (bi *BreakIterator) Next() int32 {
@@ -57,6 +97,10 @@ func (bi *BreakIterator) Next() int32 {
 func (bi *BreakIterator) Close() {
 	bi.closeTextUnit()
 	bi.closeBreakIterator()
+}
+
+func (bi *BreakIterator) IsClosed() bool {
+	return bi.iterator == nil
 }
 
 func (bi *BreakIterator) closeTextUnit() {
