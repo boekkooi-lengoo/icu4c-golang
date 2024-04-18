@@ -2,7 +2,7 @@ GENERATOR:
   PackageName: icu
   PackageDescription: "Package vorbis provides Go bindings for ICU4C."
   PackageLicense: ""
-  PkgConfigOpts: [icu-i18n, icu-io, icu-uc]
+  PkgConfigOpts: [icu-i18n]
   SysIncludes:
     - "unicode/utypes.h"
     - "unicode/utext.h"

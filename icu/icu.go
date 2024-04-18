@@ -4,7 +4,7 @@
 package icu
 
 /*
-#cgo pkg-config: icu-i18n icu-io icu-uc
+#cgo pkg-config: icu-i18n
 #cgo LDFLAGS: -licuuc -licudata
 #include <unicode/utypes.h>
 #include <unicode/utext.h>
