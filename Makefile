@@ -11,7 +11,7 @@ build: build-icu4c
 	go build main.go
 
 build-icu4c: $(c-for-go)
-	$(c-for-go) $(CURDIR)/icu4c.yaml
+	$(c-for-go) -nostamp $(CURDIR)/icu4c.yaml
 	sed -i -e 's/NewbreakIterator/newBreakIterator/g' -e 's/Newtext/newText/g' "$(CURDIR)/icu/cgo_helpers.go"
 	sed -i -e 's/NewbreakIterator/newBreakIterator/g' -e 's/Newtext/newText/g' "$(CURDIR)/icu/icu.go"
 
